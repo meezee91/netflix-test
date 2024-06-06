@@ -1,0 +1,94 @@
+name: Destroy AWS Resources
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - destroy
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Initialize Terraform
+      run: |
+        cd terraform
+        terraform init
+
+    - name: Destroy Terraform Managed Infrastructure
+      run: |
+        cd terraform
+        terraform destroy -auto-approve -var aws_account_id=${{ secrets.AWS_ACCOUNT_ID }} || true
+
+    - name: Delete ECS Task Definitions
+      run: |
+        TASK_DEFINITIONS=$(aws ecs list-task-definitions --query "taskDefinitionArns[?contains(@, 'ce5-group-3-ecs-task-${{ github.ref_name }}-netflixclone')]" --output text)
+        for task_def in $TASK_DEFINITIONS; do
+          aws ecs deregister-task-definition --task-definition $task_def || true
+        done
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Delete ECR Repositories
+      run: |
+        REPOSITORIES=$(aws ecr describe-repositories --query "repositories[?contains(repositoryName, 'ce5-group-3-ecrrepository-${{ github.ref_name }}-netflixclone')].repositoryName" --output text)
+        for repo in $REPOSITORIES; do
+          aws ecr delete-repository --repository-name $repo --force || true
+        done
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Delete VPCs
+      run: |
+        VPC_IDS=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=ce5-group-3-vpc-dev-netflixclone" --query "Vpcs[].VpcId" --output text)
+        for vpc_id in $VPC_IDS; do
+          echo "Deleting dependencies for VPC: $vpc_id"
+
+          # Detach and delete all VPC gateways
+          GATEWAY_IDS=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$vpc_id" --query "InternetGateways[].InternetGatewayId" --output text)
+          for gateway_id in $GATEWAY_IDS; do
+            aws ec2 detach-internet-gateway --internet-gateway-id $gateway_id --vpc-id $vpc_id || true
+            aws ec2 delete-internet-gateway --internet-gateway-id $gateway_id || true
+          done
+
+          # Delete all VPC subnets
+          SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" --query "Subnets[].SubnetId" --output text)
+          for subnet_id in $SUBNET_IDS; do
+            aws ec2 delete-subnet --subnet-id $subnet_id || true
+          done
+
+          # Delete all route table associations
+          RTB_ASSOCIATIONS=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$vpc_id" --query "RouteTables[].Associations[?Main!=true].RouteTableAssociationId" --output text)
+          for rtb_assoc in $RTB_ASSOCIATIONS; do
+            aws ec2 disassociate-route-table --association-id $rtb_assoc || true
+          done
+
+          # Delete all route tables
+          RTB_IDS=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$vpc_id" --query "RouteTables[].RouteTableId" --output text)
+          for rtb_id in $RTB_IDS; do
+            aws ec2 delete-route-table --route-table-id $rtb_id || true
+          done
+
+          # Delete the VPC
+          aws ec2 delete-vpc --vpc-id $vpc_id || true
+        done
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      continue-on-error: true
