@@ -172,7 +172,9 @@ jobs:
          
          #terraform plan
             - name: Terraform Plan
-              run: terraform plan 
+              run: |
+               cd terraform
+               terraform plan 
          
          #terraform validate
             - name: Terraform validate
