@@ -86,5 +86,5 @@ variable "ecr_url" {
 variable "ecr_image_name" {
     description = "ECR image name"
     type        = string
-    default     = "tarmizi-node-app"
+    default     = "group-3-ecr-netflix-clone"
 }
