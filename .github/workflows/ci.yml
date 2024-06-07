@@ -63,7 +63,7 @@ jobs:
         working-directory: backend
         run: |
             docker build -t ${{ vars.IMAGE_NAME }} .
-            docker tag ${{ vars.IMAGE_NAME }}:latest ${{ env.ECR_ENDPOINT }}/${{ vars.IMAGE_NAME }}:latest
+            docker tag group-3-ecr-netflix-clone:latest ${{ env.ECR_ENDPOINT }}/group-3-ecr-netflix-clone:latest
       - name: Run image scan
         uses: aquasecurity/trivy-action@master
         with:
