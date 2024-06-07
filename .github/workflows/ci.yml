@@ -1,11 +1,11 @@
 name: ECS Continuous Integration
 run-name: ${{ github.actor }} is running Continuous Integration on GitHub Actions 🚀
-on:
-    push:
-      paths:
-        - 'frontend/**'
-        - 'backend/**'
-        - 'terraform/**'
+on: [push]
+
+
+
+
+
 env: 
   ECR_ENDPOINT: 255945442255.dkr.ecr.us-east-1.amazonaws.com
 
@@ -17,9 +17,9 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4.1.5
-      - name: Run installation of dependencies commands
-        run: npm install
-
+    #   - name: Run installation of dependencies commands
+        # run: npm install
+# 
 
   code-unit-testing:
     runs-on: ubuntu-latest
