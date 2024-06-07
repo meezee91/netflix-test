@@ -2,8 +2,6 @@ name: ECS Continuous Integration
 run-name: ${{ github.actor }} is running Continuous Integration on GitHub Actions 🚀
 on:
     push:
-      branches:
-        - main
       paths:
         - 'frontend/**'
         - 'backend/**'
