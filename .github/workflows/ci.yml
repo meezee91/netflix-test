@@ -154,7 +154,9 @@ jobs:
          
          #terraform init
             - name: Initialize Terraform
-              run: terraform init
+              run: |
+               cd terraform
+               terraform init
          
          #terraform fmt
             - name: Terraform prettify
@@ -172,9 +174,7 @@ jobs:
          
          #terraform plan
             - name: Terraform Plan
-              run: |
-               cd terraform
-               terraform plan 
+              run: terraform plan 
          
          #terraform validate
             - name: Terraform validate
