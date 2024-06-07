@@ -9,8 +9,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-    #   - name: Run installation of dependencies commands
-        # run: npm install
+      - name: Run installation of dependencies commands
+        run: npm install
 # 
 #   code-unit-testing:
     # runs-on: ubuntu-latest
