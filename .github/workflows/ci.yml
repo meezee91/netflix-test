@@ -50,7 +50,7 @@ jobs:
       - name: Create ECR if it does not exist
         run: |
          aws ecr describe-repositories --repository-names group-3-ecr-netflix-clone || \
-         aws ecr create-repository --repository-name group-3-ecr-netflix-clone
+         aws ecr create-repository --repository-name group-3-ecr-netflix-clone/${{ vars.IMAGE_NAME }}
 
         env: 
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -63,7 +63,7 @@ jobs:
         working-directory: backend
         run: |
             docker build -t ${{ vars.IMAGE_NAME }} .
-            docker tag group-3-ecr-netflix-clone:latest ${{ env.ECR_ENDPOINT }}/group-3-ecr-netflix-clone:latest
+            docker tag ${{ vars.IMAGE_NAME }}:latest ${{ env.ECR_ENDPOINT }}/${{ vars.IMAGE_NAME }}:latest
       - name: Run image scan
         uses: aquasecurity/trivy-action@master
         with:
@@ -74,12 +74,12 @@ jobs:
             vuln-type: 'os,library'
             severity: 'MEDIUM,HIGH,CRITICAL'
       - name: Docker publish to ECR
-        run: docker push ${{ env.ECR_ENDPOINT }}:latest
+        run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.IMAGE_NAME }}:latest
 
   deploy-image-dev:
     needs: [build-and-scan-image]
     name: "Deployed image to dev"
-    uses: meezee91/c5-containers-cicd/.github/workflows/cd.yml@main
+    uses: meezee91/netflix-test/.github/workflows/cd.yml@main
     with:
         target_env: "dev"
         action: "deploy"
