@@ -17,9 +17,11 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4.1.5
-    #   - name: Run installation of dependencies commands
-        # run: npm install
-# 
+      - name: Run installation of dependencies commands
+        run: | 
+            cd frontend
+            npm install
+
 
 #   code-unit-testing:
     # runs-on: ubuntu-latest
