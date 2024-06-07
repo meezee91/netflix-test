@@ -76,15 +76,15 @@ jobs:
       - name: Docker publish to ECR
         run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.IMAGE_NAME }}:latest
 
-  deploy-image-dev:
-    needs: [build-and-scan-image]
-    name: "Deployed image to dev"
-    uses: meezee91/netflix-test/.github/workflows/cd.yml@main
-    with:
-        target_env: "dev"
-        action: "deploy"
-    secrets: inherit
-    if: ${{ github.ref_name == 'main' || github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/') }}
+#   deploy-image-dev:
+    # needs: [build-and-scan-image]
+    # name: "Deployed image to dev"
+    # uses: meezee91/netflix-test/.github/workflows/cd.yml@main
+    # with:
+        # target_env: "dev"
+        # action: "deploy"
+    # secrets: inherit
+    # if: ${{ github.ref_name == 'main' || github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/') }}
 
 #   deploy-image-uat:
     # needs: [build-and-scan-image]
