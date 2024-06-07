@@ -52,7 +52,9 @@ jobs:
             aws-region: us-east-1
 
         - name: Terraform init
-          run: terraform init
+          run: |
+           cd terraform 
+           terraform init
 
         - name: Terraform workspace list
           run: terraform workspace list
@@ -65,7 +67,6 @@ jobs:
         - name: Terraform apply or destroy
           run: |
             if [ "${{ inputs.action }}" = "create" ] || [ "${{ inputs.action }}" = "deploy"  ]; then
-              cd terraform
               terraform plan -var-file=${{ inputs.target_env }}.tfvars
               terraform apply -var-file=${{ inputs.target_env }}.tfvars --auto-approve
             elif [ "${{ inputs.action }}" = "destroy" ]; then
