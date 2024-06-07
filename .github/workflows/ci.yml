@@ -135,7 +135,7 @@ jobs:
       - name: Docker publish to ECR
         run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.IMAGE_NAME }}:latest
 
- terraform-ci:
+  terraform-ci:
             runs-on: ubuntu-latest
          
             steps:
