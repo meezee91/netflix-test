@@ -5,7 +5,7 @@ on:
       paths:
         - 'frontend/**'
         - 'backend/**'
-        - 'infrastructure/terraform/**'
+        - 'terraform/**'
 env: 
   ECR_ENDPOINT: 255945442255.dkr.ecr.us-east-1.amazonaws.com
 
