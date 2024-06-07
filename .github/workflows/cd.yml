@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
     inputs:
         target_env:
-            type: environment
+            type: choice
+            options:
+                - dev
+                - uat
+                - prod
             description: Select the environment
         action:
             type: choice
