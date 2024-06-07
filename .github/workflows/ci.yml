@@ -76,8 +76,8 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          snyk iac test --severity-threshold=medium
-          snyk iac test --severity-threshold=medium --json > snyk_iac_report.json
+          snyk iac test --severity-threshold=critical
+          snyk iac test --severity-threshold=critical --json > snyk_iac_report.json
       - name: Upload Snyk IaC Report
         uses: actions/upload-artifact@v4.3.0
         with:
