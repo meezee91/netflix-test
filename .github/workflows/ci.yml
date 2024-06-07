@@ -15,7 +15,7 @@ jobs:
 
   code-unit-testing:
     runs-on: ubuntu-latest
-    needs: [install-dependencies, code-ql-scanning]
+    needs: [install-dependencies]
     outputs:
       status: ${{ job.status }}
     steps:
