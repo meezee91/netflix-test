@@ -74,7 +74,7 @@ jobs:
             vuln-type: 'os,library'
             severity: 'MEDIUM,HIGH,CRITICAL'
       - name: Docker publish to ECR
-        run: docker push ${{ env.ECR_ENDPOINT }}/${{ vars.IMAGE_NAME }}:latest
+        run: docker push ${{ env.ECR_ENDPOINT }}:latest
 
   deploy-image-dev:
     needs: [build-and-scan-image]
